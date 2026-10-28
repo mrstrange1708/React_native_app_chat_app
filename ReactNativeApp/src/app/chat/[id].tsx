@@ -1,4 +1,5 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { useHeaderHeight } from 'expo-router/react-navigation';
 import { useEffect, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +19,9 @@ function merge(a: Message[], b: Message[]) {
 export default function ChatScreen() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const theme = useTheme();
+  // iOS 26 draws content under the glass header, and an inverted list can't use automatic insets.
+  const headerHeight = useHeaderHeight();
+  const headerOffset = Platform.OS === 'ios' ? headerHeight : 0;
   const [meId, setMeId] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [cursor, setCursor] = useState<string | null | undefined>();
@@ -73,12 +77,12 @@ export default function ChatScreen() {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { paddingTop: headerOffset }]}>
       <Stack.Screen options={{ title: name ?? 'Chat' }} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={100}>
+        keyboardVerticalOffset={headerOffset}>
         {!!error && <ThemedText type="small" style={styles.error}>{error}</ThemedText>}
         <FlatList
           inverted

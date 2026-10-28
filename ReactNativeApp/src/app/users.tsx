@@ -36,6 +36,8 @@ export default function UsersScreen() {
     <ThemedView style={styles.container}>
       {!!error && <ThemedText type="small" style={styles.error}>{error}</ThemedText>}
       <FlatList
+        // iOS 26 draws content under the glass header; this insets the list below it
+        contentInsetAdjustmentBehavior="automatic"
         data={users}
         keyExtractor={(u) => u.id}
         refreshing={loading}
